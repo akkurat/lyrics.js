@@ -8,10 +8,10 @@
     "visualize": "meteor --production --extra-packages bundle-visualizer"
   },
   "dependencies": {
-    "@babel/runtime": "^7.6.0",
+    "@babel/runtime": "^7.11.0",
     "bcrypt": "^3.0.8",
     "classnames": "^2.2.6",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "meteor-node-stubs": "^1.0.0",
     "react": "^16.13.0",
     "react-dom": "^16.13.0"
@@ -24,6 +24,14 @@
     "testModule": "tests/main.js"
   },
   "devDependencies": {
-    "chai": "^4.2.0"
+    "@types/react": "^16.9.23",
+    "chai": "^4.2.0",
+    "@types/core-js": "^0.9.46",
+    "@types/node": "^9.6.18",
+    "@types/requirejs": "^2.1.31",
+    "babel-plugin-inline-react-svg": "^1.1.1",
+    "meteor-typings": "^1.4.1",
+    "typescript": "3.7.5",
+    "typescript-plugin-add-type": "^1.0.2"
   }
 }
