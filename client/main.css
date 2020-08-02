@@ -42,10 +42,15 @@ body {
 .simple-todos-react .task-form {
   margin-top: 1rem;
   display: flex;
+  flex-wrap: wrap;
 }
 
 .simple-todos-react .task-form input {
   flex-grow: 1;
+}
+.simple-todos-react .task-form textarea {
+  flex-grow: 1;
+  min-width: 500px;
 }
 
 .simple-todos-react .login-form {
@@ -70,3 +75,9 @@ body {
 .simple-todos-react .login-form button[type=submit] {
   float: right;
 }
+
+.toggle {
+  width: 100%;
+  background: lightblue;
+}
+

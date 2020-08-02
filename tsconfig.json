@@ -20,6 +20,7 @@
 			"./node_modules"
 		],
 		"types": [
+			"meteor",
 			"meteor-typings",
 			"core-js",
 			"requirejs"

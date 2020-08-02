@@ -1,10 +1,23 @@
 import { Mongo } from 'meteor/mongo';
 import { check } from 'meteor/check';
 
-export const Tasks = new Mongo.Collection('tasks');
+import { Meteor } from 'meteor/meteor'
+
+
+export interface ITask {
+      text: string
+      content: string 
+      createdAt: Date
+      owner: any
+      username: string
+      isPrivate?: boolean
+      isChecked?: boolean
+}
+
+export const Tasks = new Mongo.Collection<ITask>('tasks');
 
 Meteor.methods({
-  'tasks.insert'(text) {
+  'tasks.insert'(text: string, content:string) {
     check(text, String);
 
     if (!this.userId) {
@@ -13,6 +26,7 @@ Meteor.methods({
 
     Tasks.insert({
       text,
+      content,
       createdAt: new Date,
       owner: this.userId,
       username: Meteor.users.findOne(this.userId).username

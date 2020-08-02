@@ -1,75 +1,34 @@
-import React, { useState } from 'react';
-import { useTracker } from 'meteor/react-meteor-data';
-import _ from 'lodash';
-import { Task } from './Task';
-import { Tasks } from '/imports/api/tasks';
-import { TaskForm } from './TaskForm';
-import { LoginForm } from './LoginForm';
+import React from 'react'
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import DocumentTitle from 'react-document-title';
+import { Overview } from './pages/Overview';
+// import { Overview } from './pages/Overview';
 
-const toggleChecked = ({ _id, isChecked }) => {
-  Meteor.call('tasks.setChecked', _id, !isChecked);
-};
 
-const togglePrivate = ({ _id, isPrivate }) => {
-  Meteor.call('tasks.setPrivate', _id, !isPrivate);
-};
 
-const deleteTask = ({ _id }) => Meteor.call('tasks.remove', _id);
+export class LyricsApp extends React.Component<{},{}> {
 
-export const App = () => {
-  const filter = {};
 
-  const [hideCompleted, setHideCompleted] = useState(false);
+  render() {
+  
+  const nA404 = <div className="content chordsheet-colors">
+        <DocumentTitle title="Hölibu | 404" />
+        <span id="logo">
+            <h1>404</h1>
+            <h2>n/A</h2>
+        </span>
+    </div>;
 
-  if (hideCompleted) {
-    _.set(filter, 'checked', false);
-  }
-
-  const { tasks, incompleteTasksCount, user } = useTracker(() => {
-    Meteor.subscribe('tasks');
-
-    return ({
-      tasks: Tasks.find(filter, {sort: {createdAt: -1}}).fetch(),
-      incompleteTasksCount: Tasks.find({checked: {$ne: true}}).count(),
-      user: Meteor.user(),
-    });
-  });
-
-  if (!user) {
     return (
-      <div className="simple-todos-react">
-        <LoginForm/>
-      </div>
-    );
+    <BrowserRouter>
+    <div>Gagi</div>
+    <Switch>
+        <Route path="/view/shits" component={Overview} />
+        <Route>
+            Gagi
+        </Route>
+    </Switch>
+    </BrowserRouter>
+    )
   }
-
-  return (
-    <div className="simple-todos-react">
-      <h1>Todo List ({ incompleteTasksCount })</h1>
-
-      <div className="filters">
-        <label>
-          <input
-              type="checkbox"
-              readOnly
-              checked={ Boolean(hideCompleted) }
-              onClick={() => setHideCompleted(!hideCompleted)}
-          />
-          Hide Completed
-        </label>
-      </div>
-
-      <ul className="tasks">
-        { tasks.map(task => <Task
-          key={ task._id }
-          task={ task }
-          onCheckboxClick={toggleChecked}
-          onDeleteClick={deleteTask}
-          onTogglePrivateClick={togglePrivate}
-        />) }
-      </ul>
-
-      <TaskForm />
-    </div>
-  );
-};
+}
