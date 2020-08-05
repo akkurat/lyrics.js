@@ -3,6 +3,7 @@ import { FunctionComponent, useState } from 'react'
 import classnames from 'classnames';
 
 import { ITask } from '../../api/tasks';
+import { NavLink } from 'react-router-dom';
 
 export interface TaskProps {
   task: ITask,
@@ -14,8 +15,13 @@ export const Task: FunctionComponent<TaskProps> = ({ task, onCheckboxClick, onDe
 
     const top = <React.Fragment> <button onClick={() => onDeleteClick(task)}>&times;</button>
         <button onClick={() => onTogglePrivateClick(task)}>{task.isPrivate ? 'Private' : 'Public'}</button>
-        <span>{task.text} {task.username && <i>({task.username})</i>}</span>
-        <span>{task.content ? <>&hellip;</> : ''}</span> 
+        <span>
+          <NavLink to={`/view/shits/${task._id}`}>{task.text}</NavLink>
+           {task.username && <i>({task.username})</i>}
+          </span>
+         
+        
+        {task.content ? <span>&hellip;</span> : null}
         <input
             type="checkbox"
             checked={Boolean(task.isChecked)}
@@ -24,7 +30,7 @@ export const Task: FunctionComponent<TaskProps> = ({ task, onCheckboxClick, onDe
         /></React.Fragment>
   return (
     <li className={classes}>
-        <ContentOpener top={top }>
+        <ContentOpener top={top}>
       <div>{task.content}</div>
       </ContentOpener>
     </li>

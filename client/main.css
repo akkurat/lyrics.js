@@ -81,3 +81,23 @@ body {
   background: lightblue;
 }
 
+
+.verse {
+  margin-bottom: 2em;
+  display: table
+}
+
+.line {
+  display: table-row
+}
+
+.line>span {
+  display: table-cell;
+}
+
+.word-start {
+  padding-left: 0.5em;
+}
+.word-end {
+  padding-right: 0.5em;
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, FunctionComponent } from 'react';
 import { useTracker } from 'meteor/react-meteor-data';
 import _ from 'lodash';
 import { Task } from '../components/Task';
@@ -16,7 +16,7 @@ const togglePrivate = ({ _id, isPrivate }) => {
 
 const deleteTask = ({ _id }) => Meteor.call('tasks.remove', _id);
 
-export const Overview = () => {
+export const Overview: FunctionComponent = () => {
   const filter = {};
 
   const [hideCompleted, setHideCompleted] = useState(false);

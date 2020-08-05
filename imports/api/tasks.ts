@@ -5,6 +5,7 @@ import { Meteor } from 'meteor/meteor'
 
 
 export interface ITask {
+      _id: string;
       text: string
       content: string 
       createdAt: Date
@@ -60,6 +61,23 @@ Meteor.methods({
         isChecked
       }
     });
+  },
+
+  'tasks.updateContent'(taskId: string, content: string ) {
+    check(taskId, String);
+    check(content, String);
+
+    const task = Tasks.findOne(taskId);
+
+    if (!this.userId || task.owner !== this.userId) {
+      throw new Meteor.Error('Not authorized.');
+    }
+
+    Tasks.update(taskId, {
+      $set: {
+        content
+      }
+    })
   },
 
   'tasks.setPrivate'(taskId, isPrivate) {
