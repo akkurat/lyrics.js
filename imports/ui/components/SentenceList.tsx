@@ -1,7 +1,7 @@
 import { FunctionComponent } from "react";
 import React from "react";
 import { useTracker } from "meteor/react-meteor-data";
-import { Sentences, ISentence } from "../../api/sentences";
+import { CSentences, ISentence } from "../../api/sentences";
 
 function handleItemClick(ev: React.MouseEvent<HTMLLIElement, MouseEvent>,s: ISentence) {
     if(!ev.altKey) {
@@ -19,7 +19,7 @@ export const SentenceList : FunctionComponent<{}> = () => {
         Meteor.subscribe('sentences');
 
         return ({
-          sentences: Sentences.find({}, {sort: {createdAt: -1}}).fetch(),
+          sentences: CSentences.find({}, {sort: {createdAt: -1}}).fetch(),
           user: Meteor.user(),
         });
     } )

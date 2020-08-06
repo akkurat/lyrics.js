@@ -12,13 +12,18 @@
     "@types/react-router-dom": "^5.1.5",
     "bcrypt": "^3.0.8",
     "classnames": "^2.2.6",
+    "hyphenation.en-us": "^0.2.1",
+    "hypher": "^0.2.5",
     "lodash": "^4.17.19",
     "meteor-node-stubs": "^1.0.0",
     "react": "^16.13.0",
+    "react-data-table-component": "^6.11.0",
     "react-document-title": "^2.0.3",
     "react-dom": "^16.13.0",
     "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0"
+    "react-router-dom": "^5.2.0",
+    "styled-components": "^5.1.1",
+    "underscore": "^1.10.2"
   },
   "meteor": {
     "mainModule": {

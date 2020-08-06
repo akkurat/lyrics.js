@@ -15,7 +15,7 @@ export interface ITask {
       isChecked?: boolean
 }
 
-export const Tasks = new Mongo.Collection<ITask>('tasks');
+export const CTasks = new Mongo.Collection<ITask>('tasks');
 
 Meteor.methods({
   'tasks.insert'(text: string, content:string) {
@@ -25,7 +25,7 @@ Meteor.methods({
       throw new Meteor.Error('Not authorized.');
     }
 
-    Tasks.insert({
+    CTasks.insert({
       text,
       content,
       createdAt: new Date,
@@ -37,26 +37,26 @@ Meteor.methods({
   'tasks.remove'(taskId) {
     check(taskId, String);
 
-    const task = Tasks.findOne(taskId);
+    const task = CTasks.findOne(taskId);
 
     if (!this.userId || task.owner !== this.userId) {
       throw new Meteor.Error('Not authorized.');
     }
 
-    Tasks.remove(taskId);
+    CTasks.remove(taskId);
   },
 
   'tasks.setChecked'(taskId, isChecked) {
     check(taskId, String);
     check(isChecked, Boolean);
 
-    const task = Tasks.findOne(taskId);
+    const task = CTasks.findOne(taskId);
 
     if (task.isPrivate && task.owner !== this.userId) {
       throw new Meteor.Error('Not authorized.');
     }
 
-    Tasks.update(taskId, {
+    CTasks.update(taskId, {
       $set: {
         isChecked
       }
@@ -67,13 +67,13 @@ Meteor.methods({
     check(taskId, String);
     check(content, String);
 
-    const task = Tasks.findOne(taskId);
+    const task = CTasks.findOne(taskId);
 
     if (!this.userId || task.owner !== this.userId) {
       throw new Meteor.Error('Not authorized.');
     }
 
-    Tasks.update(taskId, {
+    CTasks.update(taskId, {
       $set: {
         content
       }
@@ -84,13 +84,13 @@ Meteor.methods({
     check(taskId, String);
     check(isPrivate, Boolean);
 
-    const task = Tasks.findOne(taskId);
+    const task = CTasks.findOne(taskId);
 
     if (!this.userId || task.owner !== this.userId) {
       throw new Meteor.Error('Not authorized.');
     }
 
-    Tasks.update(taskId, {
+    CTasks.update(taskId, {
       $set: {
         isPrivate
       }
@@ -100,7 +100,7 @@ Meteor.methods({
 
 if (Meteor.isServer) {
   Meteor.publish('tasks', function() {
-    return Tasks.find({
+    return CTasks.find({
       $or: [
         { private: { $ne: true } },
         { owner: this.userId }

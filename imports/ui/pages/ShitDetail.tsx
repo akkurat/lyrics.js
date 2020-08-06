@@ -1,4 +1,4 @@
-import { ITask, Tasks } from "../../api/tasks";
+import { ITask, CTasks } from "../../api/tasks";
 import React, { Props, FunctionComponent, MouseEvent, createRef, Ref, RefObject, useState } from "react";
 import { useTracker } from "meteor/react-meteor-data";
 import { Hyphenator } from "../components/Hyphenator";
@@ -10,13 +10,13 @@ export interface IShitDetailState {
     // localText: string
 }
 
-var Hypher = require('hypher'),
+var Hypher = require('hypher')
 export const ShitDetail: FunctionComponent<IShitDetailProps> = (props: IShitDetailProps) => {
 
     const { task } = useTracker(() => {
         Meteor.subscribe('tasks');
         return ({
-            task: Tasks.findOne({ _id: props.shit_id })
+            task: CTasks.findOne({ _id: props.shit_id })
         });
     });
 

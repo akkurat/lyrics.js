@@ -2,7 +2,7 @@ import React, { useState, FunctionComponent } from 'react';
 import { useTracker } from 'meteor/react-meteor-data';
 import _ from 'lodash';
 import { Task } from '../components/Task';
-import { Tasks } from '../../api/tasks';
+import { CTasks } from '../../api/tasks';
 import { TaskForm } from '../components/TaskForm';
 import { LoginForm } from '../components/LoginForm';
 
@@ -30,8 +30,8 @@ export const Overview: FunctionComponent = () => {
     Meteor.subscribe('tasks');
 
     return ({
-      tasks: Tasks.find(filter, {sort: {createdAt: -1}}).fetch(),
-      incompleteTasksCount: Tasks.find({checked: {$ne: true}}).count(),
+      tasks: CTasks.find(filter, {sort: {createdAt: -1}}).fetch(),
+      incompleteTasksCount: CTasks.find({checked: {$ne: true}}).count(),
       user: Meteor.user(),
     });
   });

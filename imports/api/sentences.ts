@@ -14,7 +14,7 @@ export interface ISentence {
   isChecked?: boolean
 }
 
-export const Sentences = new Mongo.Collection<ISentence>('sentences');
+export const CSentences = new Mongo.Collection<ISentence>('sentences');
 
 Meteor.methods({
   'sentences.insert'(content: string, splitlines: boolean) {
@@ -27,7 +27,7 @@ Meteor.methods({
 
     if (splitlines) {
       content.split(/\n{2,}/).forEach(line => {
-        Sentences.insert({
+        CSentences.insert({
           content: line,
           createdAt: new Date,
           owner: this.userId,
@@ -35,7 +35,7 @@ Meteor.methods({
         })
       })
     } else {
-      Sentences.insert({
+      CSentences.insert({
         content,
         createdAt: new Date,
         owner: this.userId,
@@ -49,7 +49,7 @@ Meteor.methods({
     if (!this.userId) {
       throw new Meteor.Error('Not authorized.');
     }
-    return Sentences.remove(id)
+    return CSentences.remove(id)
   }
 
 
@@ -57,7 +57,7 @@ Meteor.methods({
 
 if (Meteor.isServer) {
   Meteor.publish('sentences', function () {
-    return Sentences.find({
+    return CSentences.find({
       $or: [
         { private: { $ne: true } },
         { owner: this.userId }

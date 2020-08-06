@@ -4,6 +4,7 @@ import DocumentTitle from 'react-document-title';
 import { Overview } from './pages/Overview';
 import { ShitDetail } from './pages/ShitDetail';
 import { Sentences } from './pages/Sentences'
+import { Words } from './pages/Words';
 // import { Overview } from './pages/Overview';
 
 
@@ -25,7 +26,8 @@ export class LyricsApp extends React.Component<{},{}> {
     <BrowserRouter>
     <div>Gagi</div>
     <Switch>
-        <Route path="/sentences/*" exact={false} component={Sentences} />
+        <Route path="/sentences/" exact={false}><Sentences/></Route>
+        <Route path="/words/" exact={false}><Words/></Route>
         <Route path="/view/shits/:shitid" render={(routerProps) => {
                     const shitid = routerProps.match.params.shitid
                     return <ShitDetail shit_id={shitid} />
@@ -33,7 +35,7 @@ export class LyricsApp extends React.Component<{},{}> {
 
         } >
         </Route>
-        <Route path="/view/shits" component={Overview} />
+        <Route path="/view/shits"><Overview/></Route>
         <Route>
             {nA404}
         </Route>

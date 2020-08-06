@@ -1,13 +1,36 @@
 import { Component } from "react";
 import React from "react";
-import { Sentences, ISentence } from "../../api/sentences";
+import { CSentences, ISentence } from "../../api/sentences";
 import { withTracker } from "meteor/react-meteor-data";
+import DataTable from 'react-data-table-component'
+import { CWords } from "../../api/words";
 
 class SentenceStats_ extends Component<ISentencesTrackerProps> {
     render() {
+        const entries = Array.from(this.extractWords().entries())
+        entries.sort( (e2,e1) => e1[1].count-e2[1].count )
+        const data = entries.map(e => ({ word: e[0], count: e[1].count })) 
+        const columns = this.createTable()
+        
         return <div>
-            {JSON.stringify(this.extractWords().entries())}
+            <button onClick={ev => this.addToIndex(data)} >ADd to Index</button>
+            <DataTable {...{data,columns}} onRowClicked={this.handleRowClicked}></DataTable>
         </div>
+    }
+
+    addToIndex(data: {word:string}[]) {
+        Meteor.call('words.insert', data.map(w => w.word))
+    }
+
+    handleRowClicked(row, ev) {
+    }
+
+    createTable() {
+        return [
+            {name:'Word', selector: 'word'},
+            {name:'Count', selector: 'count'}
+        ]
+
     }
 
     extractWords() {
@@ -17,7 +40,7 @@ class SentenceStats_ extends Component<ISentencesTrackerProps> {
 
        for( const sentence of s )
        {
-           for( const w of sentence.content.split(/\W/) )
+           for( const w of sentence.content.split(/[^A-Za-z-ÁÀȦÂÄǞǍĂĀÃÅǺǼǢĆĊĈČĎḌḐḒÉÈĖÊËĚĔĒẼE̊ẸǴĠĜǦĞG̃ĢĤḤáàȧâäǟǎăāãåǻǽǣćċĉčďḍḑḓéèėêëěĕēẽe̊ẹǵġĝǧğg̃ģĥḥÍÌİÎÏǏĬĪĨỊĴĶǨĹĻĽĿḼM̂M̄ʼNŃN̂ṄN̈ŇN̄ÑŅṊÓÒȮȰÔÖȪǑŎŌÕȬŐỌǾƠíìiîïǐĭīĩịĵķǩĺļľŀḽm̂m̄ŉńn̂ṅn̈ňn̄ñņṋóòôȯȱöȫǒŏōõȭőọǿơP̄ŔŘŖŚŜṠŠȘṢŤȚṬṰÚÙÛÜǓŬŪŨŰŮỤẂẀŴẄÝỲŶŸȲỸŹŻŽẒǮp̄ŕřŗśŝṡšşṣťțṭṱúùûüǔŭūũűůụẃẁŵẅýỳŷÿȳỹźżžẓǯßœŒçÇ]/) )
            {
               if (map.has(w)) {
                   map.get(w).inc()
@@ -52,7 +75,7 @@ const tracker = withTracker( p => {
     Meteor.subscribe('sentences');
 
     const a: ISentencesTrackerProps = {
-      sentences: Sentences.find({}, {sort: {createdAt: -1}}).fetch(),
+      sentences: CSentences.find({}, {sort: {createdAt: -1}}).fetch(),
       user: Meteor.user(),
     }
     return a
