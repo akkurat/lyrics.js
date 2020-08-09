@@ -12,6 +12,7 @@
     "@types/react-router-dom": "^5.1.5",
     "bcrypt": "^3.0.8",
     "classnames": "^2.2.6",
+    "collections": "^5.1.11",
     "hyphenation.en-us": "^0.2.1",
     "hypher": "^0.2.5",
     "lodash": "^4.17.19",

@@ -2,15 +2,15 @@ import { FunctionComponent } from "react";
 import React from "react";
 import { useTracker } from "meteor/react-meteor-data";
 import { CSentences, ISentence } from "../../api/sentences";
+import { NavLink } from "react-router-dom";
 
 function handleItemClick(ev: React.MouseEvent<HTMLLIElement, MouseEvent>,s: ISentence) {
-    if(!ev.altKey) {
-        const response = confirm( `Delete item ${s.content.substr(0,20)}… created on ${s.createdAt}?`)
-        if(!response) {
-            return;
-        }
+    if(ev.altKey) {
+        ev.preventDefault()
+        const success = Meteor.call('sentences.remove',s._id)
+        return success
     }
-    const success = Meteor.call('sentences.remove',s._id)
+    
 }
 
 export const SentenceList : FunctionComponent<{}> = () => {
@@ -27,7 +27,8 @@ export const SentenceList : FunctionComponent<{}> = () => {
 
     if( sentences ) {
         return <ul>
-            {sentences.map( s => <li onClick={ev => handleItemClick(ev,s)}>{s.content}</li>)}
+
+            {sentences.map( s => <NavLink to={s._id} ><li onClick={ev => handleItemClick(ev,s)}>{s.content}</li></NavLink>)}
             </ul>
     }
 

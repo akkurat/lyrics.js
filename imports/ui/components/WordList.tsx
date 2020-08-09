@@ -25,7 +25,7 @@ const WordDisplay: FunctionComponent<{ word: PresenterWord, onClick: (word: stri
 }
 
 
-export class WordListList_ extends Component<QueryProps & { words, lookupWords, user }, { collectWords: Array<string> }> {
+export class WordListList_ extends Component<{ worddata: { words, lookupWords, user } }, { collectWords: Array<string> }> {
 
     constructor(props) {
         super(props)
@@ -65,21 +65,24 @@ export class WordListList_ extends Component<QueryProps & { words, lookupWords, 
 
     render() {
 
+        const wd = this.props.worddata;
 
-        const data: PresenterWord[] = this.props.words.map((ev: IWord) => ({
+        const data: PresenterWord[] = wd.words.map((ev: IWord) => ({
             word: ev._id,
-            phonetisations: this.props.lookupWords[ev.phonetisation],
+            phonetisations: wd.lookupWords[ev.phonetisation],
             phonetisation_id: ev.phonetisation
         }))
 
-        if (this.props.words) {
+        if (wd.words) {
 
             return <div>
-                <ul>{this.state.collectWords.map(w => <li>{w}</li>)}</ul>
+                <ul className="inline-list">{this.state.collectWords.map(w => <li>{w}</li>)}</ul>
                 {/* <WordListTable words={this.props.words} lookupWords={this.props.lookupWords}
                     onRowClicked={this.handleRowClick}
                 /> */}
+                <div className="flex-v">
                 {data.map(w => <WordDisplay key={w.word} word={w} onClick={this.collectWords} />)}
+                </div>
             </div>
         }
 
@@ -94,34 +97,10 @@ interface QueryProps {
     pageSize: number
 }
 
-const tracker = withTracker((props: QueryProps) => {
-    Meteor.subscribe('words');
-    const filter = { "_id": props.filter };
-    const totalEntries = CWords.find(filter).count()
-    const skip = props.page * props.pageSize
-    const limit = props.pageSize
-
-    const words = CWords.find(
-        filter,
-        { sort: { _id: 1 }, limit, skip }
-    ).fetch()
-
-    const phonIds = words.map(v => v.phonetisation)
-
-    const lookupWords = _.groupBy(CWords.find({
-        $and: [
-            { "phonetisation": { $exists: true } },
-            { "phonetisation": { $in: phonIds } },
-        ]
-    }).fetch(), (arg) => arg.phonetisation)
-    return ({
-        words, totalEntries, lookupWords, user: Meteor.user(),
-    });
-})
-
-const WordListList = tracker(WordListList_)
 
 export const WordList: FunctionComponent<{}> = () => {
+
+    const pageSize = 500
 
     const [filter, setFilter] = useState("")
     const [page, setPage] = useState(0)
@@ -131,11 +110,45 @@ export const WordList: FunctionComponent<{}> = () => {
     } else {
         regex = /.*/
     }
+    const worddata = useTracker(() => {
+        Meteor.subscribe('words');
+        const filter = { "_id": regex };
+        const totalEntries = CWords.find(filter).count()
+        const skip = page * pageSize
+        const limit = pageSize
+
+        const words = CWords.find(
+            filter,
+            { sort: { _id: 1 }, limit, skip }
+        ).fetch()
+
+        const phonIds = words.map(v => v.phonetisation)
+
+        const lookupWords = _.groupBy(CWords.find({
+            $and: [
+                { "phonetisation": { $exists: true } },
+                { "phonetisation": { $in: phonIds } },
+            ]
+        }).fetch(), (arg) => arg.phonetisation)
+        return ({
+            words, totalEntries, lookupWords, user: Meteor.user(),
+        });
+    })
+
+    const pages = Math.ceil( worddata.totalEntries / pageSize )
+
+    const pageNums = Array.from(new Array(pages).keys())
+
+    const paging = <div>
+        {pageNums.map(idx => <a onClick={ev => setPage( idx )}>{idx+1}</a>)}
+        <a onClick={ev => setPage(old => old - 1)}>Prev</a>
+        <a onClick={ev => setPage(old => old + 1)}>Next</a>
+        </div>
     return <div>
         <input type="text" onInput={ev => setFilter(ev.target.value)} />
-        <WordListList filter={regex} page={page} pageSize={200}/>
-        <a onClick={ev => setPage(old => old-1)}>Prev</a>
-        <a onClick={ev => setPage(old => old+1)}>Next</a>
+        {paging}
+        <WordListList_ worddata={worddata} />
+        {paging}
     </div>
 
 }

@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 import { SentenceForm } from '../components/SentenceForm'
 import { SentenceList } from '../components/SentenceList'
 import { BrowserRouter, Route, Switch, withRouter, RouteComponentProps, NavLink } from 'react-router-dom';
 import { SentenceStats } from '../components/SentenceStats';
 import { WordList } from '../components/WordList';
+import { IRelNav, RelNavComponent } from '../IRelNav';
 class Sentences_ extends React.Component<RouteComponentProps, {}> {
 
     render() {
@@ -18,7 +19,7 @@ class Sentences_ extends React.Component<RouteComponentProps, {}> {
                             <WordList></WordList>
                         </div></Route>
                     <Route>
-                        <NavLink to={`${parentPath}list`}>List</NavLink>
+                        <RelNavComponent parentPath={parentPath} paths={wordNavsJson} />
                     </Route>
                 </Switch>
             </div>
@@ -29,3 +30,6 @@ class Sentences_ extends React.Component<RouteComponentProps, {}> {
 }
 
 export const Words = withRouter(Sentences_)
+
+
+    export const wordNavsJson: IRelNav[] = [{caption: "List", relpath: "list"}]  

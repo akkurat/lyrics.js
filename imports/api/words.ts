@@ -30,12 +30,15 @@ Meteor.methods({
       if (w) {
 
         console.log("Word:", w)
+        const existing = CWords.findOne(w)
+        if(!existing) {
         CWords.insert({
           _id: w,
           createdAt: new Date,
           owner: this.userId,
           username: Meteor.users.findOne(this.userId).username
         })
+      }
       }
     })
 
