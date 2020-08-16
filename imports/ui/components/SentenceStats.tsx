@@ -1,25 +1,36 @@
-import { Component } from "react";
+import { Component, FunctionComponent, useState, useCallback, PureComponent } from "react";
 import React from "react";
 import { CSentences, ISentence } from "../../api/sentences";
 import { withTracker } from "meteor/react-meteor-data";
-import DataTable from 'react-data-table-component'
-import { CWords } from "../../api/words";
+import { CWords, IWord } from "../../api/words";
+import { NavLink } from "react-router-dom";
+import { SimpleParagraphs } from "./SentenceDetail";
+import { Correlations } from "./SentenceCorrelations";
+import { UsageList } from "./SentenceUsage";
 
-class SentenceStats_ extends Component<ISentencesTrackerProps> {
+
+class SentenceStats_ extends PureComponent<ISentencesTrackerProps, { wordMap }> {
+    constructor(p) {
+        super(p);
+        this.state = { wordMap: new Map<string,ISentence[]>() }
+    }
     render() {
-        const entries = Array.from(this.extractWords().entries())
-        entries.sort( (e2,e1) => e1[1].count-e2[1].count )
-        const data = entries.map(e => ({ word: e[0], count: e[1].count })) 
-        const columns = this.createTable()
-        
-        return <div>
-            <button onClick={ev => this.addToIndex(data)} >ADd to Index</button>
-            <DataTable {...{data,columns}} onRowClicked={this.handleRowClicked}></DataTable>
+        const entries = Array.from(this.state.wordMap.entries()).filter(([k, v]) => v.length > 1)
+        entries.sort((e2, e1) => e1[1].size - e2[1].size)
+        return <div className="stats-overview" >
+            <div className="usagelists">
+                {entries.map(([k, v]) => <UsageList title={k} usages={[...v.values()]} />)}
+                {/* todo: serverside */}
+                {/* <button onClick={ev => this.addToIndex([...wordMap.keys()])} >Add to index</button> */}
+            </div>
+            <div>
+                <Correlations s={this.props.sentences} wordmap={this.state.wordMap} />
+            </div>
         </div>
     }
 
-    addToIndex(data: {word:string}[]) {
-        Meteor.call('words.insert', data.map(w => w.word))
+    addToIndex(words: string[]) {
+        Meteor.call('words.insert', words)
     }
 
     handleRowClicked(row, ev) {
@@ -27,58 +38,38 @@ class SentenceStats_ extends Component<ISentencesTrackerProps> {
 
     createTable() {
         return [
-            {name:'Word', selector: 'word'},
-            {name:'Count', selector: 'count'}
+            { name: 'Word', selector: 'word' },
+            { name: 'Count', selector: 'count' }
         ]
 
     }
 
-    extractWords() {
-       const s = this.props.sentences 
+    componentDidMount() {
+        Meteor.call('words.mapsentences', (error, data) => {
+            this.setState({ wordMap: new Map(data) })
+        })
 
-       const map = new Map<string, Counter>();
-
-       for( const sentence of s )
-       {
-           for( const w of sentence.content.split(/[^A-Za-z-ÁÀȦÂÄǞǍĂĀÃÅǺǼǢĆĊĈČĎḌḐḒÉÈĖÊËĚĔĒẼE̊ẸǴĠĜǦĞG̃ĢĤḤáàȧâäǟǎăāãåǻǽǣćċĉčďḍḑḓéèėêëěĕēẽe̊ẹǵġĝǧğg̃ģĥḥÍÌİÎÏǏĬĪĨỊĴĶǨĹĻĽĿḼM̂M̄ʼNŃN̂ṄN̈ŇN̄ÑŅṊÓÒȮȰÔÖȪǑŎŌÕȬŐỌǾƠíìiîïǐĭīĩịĵķǩĺļľŀḽm̂m̄ŉńn̂ṅn̈ňn̄ñņṋóòôȯȱöȫǒŏōõȭőọǿơP̄ŔŘŖŚŜṠŠȘṢŤȚṬṰÚÙÛÜǓŬŪŨŰŮỤẂẀŴẄÝỲŶŸȲỸŹŻŽẒǮp̄ŕřŗśŝṡšşṣťțṭṱúùûüǔŭūũűůụẃẁŵẅýỳŷÿȳỹźżžẓǯßœŒçÇ]/) )
-           {
-              if (map.has(w)) {
-                  map.get(w).inc()
-              } else {
-                  map.set(w, new Counter())
-              } 
-           }
-       }
-
-       return map;
-       
     }
 
-}
 
-class Counter {
-    constructor(public count: number=1) {}
-    inc() {
-        this.count++;
-    }
-    toString() {
-        return this.count
-    }
+
+
 }
 
 export interface ISentencesTrackerProps {
-    sentences: ISentence[]
+    sentences: ISentence[],
     user: Meteor.User
 }
-const tracker = withTracker( p => {
+const tracker = withTracker(p => {
 
     Meteor.subscribe('sentences');
 
     const a: ISentencesTrackerProps = {
-      sentences: CSentences.find({}, {sort: {createdAt: -1}}).fetch(),
-      user: Meteor.user(),
+        sentences: CSentences.find({}, { sort: { createdAt: -1 } }).fetch(),
+        user: Meteor.user(),
     }
     return a
 })
-
 export const SentenceStats = tracker(SentenceStats_)
+
+

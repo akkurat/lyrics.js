@@ -7,6 +7,7 @@ Meteor.startup(() => {
   if (!Accounts.findUserByUsername('gagi')) {
     Accounts.createUser({
       username: 'gagi',
+      
       password: 'gagi'
     });
   }

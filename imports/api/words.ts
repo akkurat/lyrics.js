@@ -4,6 +4,7 @@ import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor'
 
 import { Random } from 'meteor/random'
+import { ISentence, splitWords, CSentences } from './sentences';
 
 
 export interface IWord {
@@ -28,17 +29,18 @@ Meteor.methods({
     words.forEach(w => {
 
       if (w) {
+        const w_ = w.toLocaleLowerCase()
 
-        console.log("Word:", w)
-        const existing = CWords.findOne(w)
-        if(!existing) {
-        CWords.insert({
-          _id: w,
-          createdAt: new Date,
-          owner: this.userId,
-          username: Meteor.users.findOne(this.userId).username
-        })
-      }
+        console.log("Word:", w_)
+        const existing = CWords.findOne(w_)
+        if (!existing) {
+          CWords.insert({
+            _id: w_,
+            createdAt: new Date,
+            owner: this.userId,
+            username: Meteor.users.findOne(this.userId).username
+          })
+        }
       }
     })
 
@@ -61,21 +63,52 @@ Meteor.methods({
     } else {
       uuid = Random.id()
     }
-    for (const word of words) {
-      CWords.update(word, { $set: { phonetisation: uuid } })
+    for (let i = 0; i < words.length; i++) {
+      CWords.update(words[i], { $set: { phonetisation: uuid } })
     }
+  },
+  'words.mapsentences'() {
+    const s = CSentences.find().fetch();
+    const map =  extractWords(s)
+    return [...map.entries()].map(([k,v]) => [k, [...v.values()]])
   }
 
+});
 
-  });
 
 if (Meteor.isServer) {
   Meteor.publish('words', function () {
-    return CWords.find({
-      $or: [
-        { private: { $ne: true } },
-        { owner: this.userId }
-      ]
-    });
+    return CWords.find({ owner: this.userId }
+    );
   })
+}
+
+function extractWords(s: ISentence[]) {
+
+
+
+  interface PresenterCaptions {
+    id: string;
+    caption: string;
+  }
+
+  const map = new Map<string, Set<ISentence>>();
+
+
+  for (const sentence of s) {
+    const words = splitWords(sentence.content);
+    sentence.words = new Set(words)
+    for (const w of words) {
+      if (map.has(w)) {
+        map.get(w).add((sentence))
+      } else {
+        const set = new Set<any>()
+        set.add((sentence))
+        map.set(w, set)
+      }
+    }
+  }
+
+  return map;
+
 }

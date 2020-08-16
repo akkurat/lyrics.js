@@ -10,6 +10,7 @@ export enum TextType {
 }
 
 export interface ISentence {
+  words: Set<string>;
   _id: string;
   content: string
   type: TextType
@@ -18,7 +19,9 @@ export interface ISentence {
   username: string
 }
 
-export const CSentences = new Mongo.Collection<ISentence>('sentences');
+export const CSentences = new Mongo.Collection<ISentence>('sentences', { 
+  transform: s => { s.words = splitWords(s.content); return s}
+});
 
 Meteor.methods({
   'sentences.insert'(content: string, type: string, splitlines: boolean) {
@@ -79,4 +82,9 @@ if (Meteor.isServer) {
       ]
     });
   })
+}
+
+export const splitRegex = /[^A-Za-z-ÁÀȦÂÄǞǍĂĀÃÅǺǼǢĆĊĈČĎḌḐḒÉÈĖÊËĚĔĒẼE̊ẸǴĠĜǦĞG̃ĢĤḤáàȧâäǟǎăāãåǻǽǣćċĉčďḍḑḓéèėêëěĕēẽe̊ẹǵġĝǧğg̃ģĥḥÍÌİÎÏǏĬĪĨỊĴĶǨĹĻĽĿḼM̂M̄ʼNŃN̂ṄN̈ŇN̄ÑŅṊÓÒȮȰÔÖȪǑŎŌÕȬŐỌǾƠíìiîïǐĭīĩịĵķǩĺļľŀḽm̂m̄ŉńn̂ṅn̈ňn̄ñņṋóòôȯȱöȫǒŏōõȭőọǿơP̄ŔŘŖŚŜṠŠȘṢŤȚṬṰÚÙÛÜǓŬŪŨŰŮỤẂẀŴẄÝỲŶŸȲỸŹŻŽẒǮp̄ŕřŗśŝṡšşṣťțṭṱúùûüǔŭūũűůụẃẁŵẅýỳŷÿȳỹźżžẓǯßœŒçÇ]/;
+export function splitWords(line: string) {
+    return line.split(splitRegex);
 }

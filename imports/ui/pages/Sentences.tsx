@@ -11,7 +11,7 @@ class Sentences_ extends React.Component<RouteComponentProps, {}> {
 
         const parentPath = this.props.match.path;
         return (
-            <div>
+            <div className="h-100">
                 {/* {JSON.stringify(this.props)} */}
                 <Switch>
                     <Route path={`${parentPath}list`}>
